@@ -80,6 +80,12 @@ defmodule LiveViewCounterWeb.Counter do
   def render(assigns) do
     ~L"""
     <div>
+      <%= live_component(
+        @socket,
+        LiveViewCounterWeb.TitleLive.TitleComponent,
+        title: "Assigns Title"
+      )
+      %>
       <h1>The count is: <%= @val %></h1>
       <button phx-click="dec">-</button>
       <button phx-click="inc">+</button>
