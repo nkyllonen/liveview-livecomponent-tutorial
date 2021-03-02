@@ -4,9 +4,11 @@ defmodule LiveViewCounterWeb.Counter do
 
   alias LiveViewCounter.Count
   alias Phoenix.PubSub
+  alias LiveViewCounter.Presence
 
-  # define a module attribute (global constant)
-  @topic "live"
+  # define module attributes (global constants)
+  @topic Count.topic
+  @presence_topic "presence"
 
   @doc """
     mount/3: mounts the module and returns a tuple
@@ -17,23 +19,31 @@ defmodule LiveViewCounterWeb.Counter do
     # subscribe to the channel topic
     PubSub.subscribe(LiveViewCounter.PubSub, @topic)
 
-    {:ok, assign(socket, :val, Count.current())}  # make API call to get current value!
+    # subscribe, participate-in, and subscribe to the Presence system
+    Presence.track(self(), @presence_topic, socket.id, %{})
+    LiveViewCounterWeb.Endpoint.subscribe(@presence_topic)
+
+    initial_present =
+      Presence.list(@presence_topic)
+      |> map_size
+
+    # make API call to get current value!
+    {:ok, assign(socket, val: Count.current(), present: initial_present)}
   end
 
   @doc """
     handle_event/3: handles "inc" event by incrementing counter and returning a tuple
       - :noreply: "do not send any further messages to the caller of this function"
       - update key :val by calling incr() in API
+
+    handle_event/3: handles "dec" event by decrementing counter and returning a tuple
+      - :noreply: "do not send any further messages to the caller of this function"
+      - update key :val by calling decr() in API
   """
   def handle_event("inc", _, socket) do
     {:noreply, assign(socket, :val, Count.incr())}
   end
 
-  @doc """
-    handle_event/3: handles "dec" event by decrementing counter and returning a tuple
-      - :noreply: "do not send any further messages to the caller of this function"
-      - update key :val by calling decr() in API
-  """
   def handle_event("dec", _, socket) do
     {:noreply, assign(socket, :val, Count.decr())}
   end
@@ -44,9 +54,22 @@ defmodule LiveViewCounterWeb.Counter do
       - :noreply: "don't send this message to the socket again"
                   (which would cause a recursive loop of updates)
       - add key value pair (val, count) to socket assigns
+
+    handle_info/2: handle Presence updates, adding joiners and subtracting leavers
+      - :noreply
+      - add key value pair (present, new_present) to socket assigns
   """
   def handle_info({:count, count}, socket) do
     {:noreply, assign(socket, val: count)}
+  end
+
+  def handle_info(
+        %{event: "presence_diff", payload: %{joins: joins, leaves: leaves}},
+        %{assigns: %{present: present}} = socket
+    ) do
+    new_present = present + map_size(joins) - map_size(leaves)
+
+    {:noreply, assign(socket, :present, new_present)}
   end
 
   @doc """
@@ -60,6 +83,7 @@ defmodule LiveViewCounterWeb.Counter do
       <h1>The count is: <%= @val %></h1>
       <button phx-click="dec">-</button>
       <button phx-click="inc">+</button>
+      <h1>Current users: <%= @present %></h1>
     </div>
     """
   end
