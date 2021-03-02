@@ -1,9 +1,20 @@
 defmodule LiveViewCounterWeb.TitleLive.TitleComponent do
   use Phoenix.LiveComponent
+  use Phoenix.HTML
 
   def render(assigns) do
     ~L"""
     <h1><%= @title %></h1>
+    <div>
+      <!-- submit action triggers "set_title" event -->
+      <%= f = form_for :heading, "#", [phx_submit: :set_title] %>
+        <%= label f, :title %>
+        <%= text_input f, :title %>
+        <div>
+          <%= submit "Set", phx_disable_with: "Setting..." %>
+        </div>
+      </form>
+    </div>
     """
   end
 

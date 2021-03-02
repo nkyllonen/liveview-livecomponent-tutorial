@@ -28,7 +28,9 @@ defmodule LiveViewCounterWeb.Counter do
       |> map_size
 
     # make API call to get current value!
-    {:ok, assign(socket, val: Count.current(), present: initial_present)}
+    {:ok, assign(socket, val: Count.current(),
+        present: initial_present,
+        title: "Initial Title")}
   end
 
   @doc """
@@ -39,6 +41,8 @@ defmodule LiveViewCounterWeb.Counter do
     handle_event/3: handles "dec" event by decrementing counter and returning a tuple
       - :noreply: "do not send any further messages to the caller of this function"
       - update key :val by calling decr() in API
+
+    handle_event/3: handles "set_title" event by updating title in its socket assigns
   """
   def handle_event("inc", _, socket) do
     {:noreply, assign(socket, :val, Count.incr())}
@@ -46,6 +50,13 @@ defmodule LiveViewCounterWeb.Counter do
 
   def handle_event("dec", _, socket) do
     {:noreply, assign(socket, :val, Count.decr())}
+  end
+
+  def handle_event(
+      "set_title",
+      %{"heading" => %{"title" => updated_title}},
+      socket) do
+    {:noreply, assign(socket, title: updated_title)}
   end
 
   @doc """
@@ -83,7 +94,7 @@ defmodule LiveViewCounterWeb.Counter do
       <%= live_component(
         @socket,
         LiveViewCounterWeb.TitleLive.TitleComponent,
-        title: "Assigns Title"
+        title: @title
       )
       %>
       <h1>The count is: <%= @val %></h1>
