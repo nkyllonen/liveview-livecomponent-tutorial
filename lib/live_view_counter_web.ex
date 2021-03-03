@@ -26,7 +26,7 @@ defmodule LiveViewCounterWeb do
       alias LiveViewCounterWeb.Router.Helpers, as: Routes
 
       # set up Phoenix App to use LiveView
-      import Phoenix.LiveView.Controller
+      # import Phoenix.LiveView.Controller
     end
   end
 

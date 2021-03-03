@@ -1,6 +1,5 @@
-defmodule LiveViewCounterWeb.Counter do
-  # use the Phoenix.LiveView behavior
-  use Phoenix.LiveView
+defmodule LiveViewCounterWeb.CounterLiveView do
+  use LiveViewCounterWeb, :live_view
 
   alias LiveViewCounter.Count
   alias Phoenix.PubSub
@@ -11,7 +10,7 @@ defmodule LiveViewCounterWeb.Counter do
   @presence_topic "presence"
 
   @doc """
-    mount/3: mounts the module and returns a tuple
+    mount/3: mounts the module and returns a tuple (can be used to set any initial state)
       - :ok
       - assign a key :val to the socket (initialized to 0)
   """
@@ -28,9 +27,7 @@ defmodule LiveViewCounterWeb.Counter do
       |> map_size
 
     # make API call to get current value!
-    {:ok, assign(socket, val: Count.current(),
-        present: initial_present,
-        title: "Initial Title")}
+    {:ok, assign(socket, val: Count.current(), present: initial_present)}
   end
 
   @doc """
@@ -41,8 +38,6 @@ defmodule LiveViewCounterWeb.Counter do
     handle_event/3: handles "dec" event by decrementing counter and returning a tuple
       - :noreply: "do not send any further messages to the caller of this function"
       - update key :val by calling decr() in API
-
-    handle_event/3: handles "set_title" event by updating title in its socket assigns
   """
   def handle_event("inc", _, socket) do
     {:noreply, assign(socket, :val, Count.incr())}
@@ -50,13 +45,6 @@ defmodule LiveViewCounterWeb.Counter do
 
   def handle_event("dec", _, socket) do
     {:noreply, assign(socket, :val, Count.decr())}
-  end
-
-  def handle_event(
-      "set_title",
-      %{"heading" => %{"title" => updated_title}},
-      socket) do
-    {:noreply, assign(socket, title: updated_title)}
   end
 
   @doc """
@@ -69,11 +57,6 @@ defmodule LiveViewCounterWeb.Counter do
     handle_info/2: handle Presence updates, adding joiners and subtracting leavers
       - :noreply
       - add key value pair (present, new_present) to socket assigns
-
-    handle_info/2: receive messages sent by StatefulComponent
-      - :noreply
-      - add key value pair (title, updated_title) to socket assigns
-        (updates :title values across ALL StatefulComponents and the TitleComponent)
   """
   def handle_info({:count, count}, socket) do
     {:noreply, assign(socket, val: count)}
@@ -88,15 +71,6 @@ defmodule LiveViewCounterWeb.Counter do
     {:noreply, assign(socket, :present, new_present)}
   end
 
-  def handle_info(
-      {LiveViewCounterWeb.TitleLive.StatefulComponent,
-      :updated_title,
-      %{title: updated_title}},
-      socket
-    ) do
-      {:noreply, assign(socket, title: updated_title)}
-  end
-
   @doc """
     render/1: renders the template using the :val state within the assigns argument
       - renders LiveView templates using the ~L sigil
@@ -105,46 +79,11 @@ defmodule LiveViewCounterWeb.Counter do
   def render(assigns) do
     ~L"""
     <div>
-      <%= live_component(
-        @socket,
-        LiveViewCounterWeb.TitleLive.TitleComponent,
-        title: @title
-      ) %>
-
       <h1>The count is: <%= @val %></h1>
       <button phx-click="dec">-</button>
       <button phx-click="inc">+</button>
       <h1>Current users: <%= @present %></h1>
-
-      <%= live_component(
-        @socket,
-        LiveViewCounterWeb.TitleLive.StatefulComponent,
-        id: "1",
-        title: @title
-      ) %>
-      <%= live_component(
-        @socket,
-        LiveViewCounterWeb.TitleLive.StatefulComponent,
-        id: "2",
-        title: @title
-      ) %>
-      <%= live_component(
-        @socket,
-        LiveViewCounterWeb.TitleLive.StatefulComponent,
-        id: "3",
-        title: @title
-      ) %>
-      <%= live_component(
-        @socket,
-        LiveViewCounterWeb.TitleLive.StatefulComponent,
-        id: "stateful-send-self-component",
-        title: @title
-      ) %>
     </div>
     """
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, socket}
   end
 end

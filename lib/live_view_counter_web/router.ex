@@ -17,8 +17,10 @@ defmodule LiveViewCounterWeb.Router do
   scope "/", LiveViewCounterWeb do
     pipe_through :browser
 
-    # live "/", PageLive, :index
-    live "/", Counter
+    live "/", PageLive, :index
+    live "/counter", CounterLiveView
+    live "/blocks", Components.BlocksLiveView
+    live "/titles", Components.TitlesLiveView
   end
 
   # Other scopes may use custom stacks.

@@ -1,4 +1,4 @@
-defmodule LiveViewCounterWeb.TitleLive.TitleComponent do
+defmodule LiveViewCounterWeb.Components.TitleComponent do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
