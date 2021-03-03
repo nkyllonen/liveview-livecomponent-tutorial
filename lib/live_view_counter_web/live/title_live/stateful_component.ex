@@ -38,11 +38,16 @@ def preload(list_of_assigns) do
   end)
 end
 
+@doc """
+  handle_event/3: handles "set_title" event by sending the new title
+                  to the parent LiveView
+"""
   def handle_event(
       "set_title",
       %{"heading" => %{"title" => updated_title}},
       socket
     ) do
-    {:noreply, assign(socket, title: updated_title)}
+    send(self(), {__MODULE__, :updated_title, %{title: updated_title}})
+    {:noreply, socket}
   end
 end

@@ -69,6 +69,11 @@ defmodule LiveViewCounterWeb.Counter do
     handle_info/2: handle Presence updates, adding joiners and subtracting leavers
       - :noreply
       - add key value pair (present, new_present) to socket assigns
+
+    handle_info/2: receive messages sent by StatefulComponent
+      - :noreply
+      - add key value pair (title, updated_title) to socket assigns
+        (updates :title values across ALL StatefulComponents and the TitleComponent)
   """
   def handle_info({:count, count}, socket) do
     {:noreply, assign(socket, val: count)}
@@ -81,6 +86,15 @@ defmodule LiveViewCounterWeb.Counter do
     new_present = present + map_size(joins) - map_size(leaves)
 
     {:noreply, assign(socket, :present, new_present)}
+  end
+
+  def handle_info(
+      {LiveViewCounterWeb.TitleLive.StatefulComponent,
+      :updated_title,
+      %{title: updated_title}},
+      socket
+    ) do
+      {:noreply, assign(socket, title: updated_title)}
   end
 
   @doc """
@@ -118,6 +132,12 @@ defmodule LiveViewCounterWeb.Counter do
         @socket,
         LiveViewCounterWeb.TitleLive.StatefulComponent,
         id: "3",
+        title: @title
+      ) %>
+      <%= live_component(
+        @socket,
+        LiveViewCounterWeb.TitleLive.StatefulComponent,
+        id: "stateful-send-self-component",
         title: @title
       ) %>
     </div>
