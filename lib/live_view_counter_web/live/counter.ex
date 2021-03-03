@@ -108,6 +108,18 @@ defmodule LiveViewCounterWeb.Counter do
         id: "1",
         title: @title
       ) %>
+      <%= live_component(
+        @socket,
+        LiveViewCounterWeb.TitleLive.StatefulComponent,
+        id: "2",
+        title: @title
+      ) %>
+      <%= live_component(
+        @socket,
+        LiveViewCounterWeb.TitleLive.StatefulComponent,
+        id: "3",
+        title: @title
+      ) %>
     </div>
     """
   end

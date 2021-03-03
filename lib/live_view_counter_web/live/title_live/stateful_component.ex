@@ -27,6 +27,17 @@ defmodule LiveViewCounterWeb.TitleLive.StatefulComponent do
     {:ok, assign(socket, title: title, id: id)}
   end
 
+@doc """
+  preload/1: called before component's update/2, receives list of component assigns
+              and maps those to a new set of assigns for each component
+              (each component's update/2 functions then receive the new assigns)
+"""
+def preload(list_of_assigns) do
+  Enum.map(list_of_assigns, fn %{id: id, title: title} ->
+    %{id: id, title: "#{title} #{id}"}
+  end)
+end
+
   def handle_event(
       "set_title",
       %{"heading" => %{"title" => updated_title}},
