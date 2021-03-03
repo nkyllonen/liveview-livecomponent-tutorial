@@ -95,13 +95,24 @@ defmodule LiveViewCounterWeb.Counter do
         @socket,
         LiveViewCounterWeb.TitleLive.TitleComponent,
         title: @title
-      )
-      %>
+      ) %>
+
       <h1>The count is: <%= @val %></h1>
       <button phx-click="dec">-</button>
       <button phx-click="inc">+</button>
       <h1>Current users: <%= @present %></h1>
+
+      <%= live_component(
+        @socket,
+        LiveViewCounterWeb.TitleLive.StatefulComponent,
+        id: "1",
+        title: @title
+      ) %>
     </div>
     """
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, socket}
   end
 end
