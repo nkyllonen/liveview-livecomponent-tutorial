@@ -51,9 +51,10 @@ defmodule LiveViewCounterWeb.Components.TitlesLiveView do
     handle_event/3: handles "set_title" event by updating title in its socket assigns
   """
   def handle_event(
-      "set_title",
-      %{"heading" => %{"title" => updated_title}},
-      socket) do
+        "set_title",
+        %{"heading" => %{"title" => updated_title}},
+        socket
+      ) do
     {:noreply, assign(socket, title: updated_title)}
   end
 
@@ -64,11 +65,10 @@ defmodule LiveViewCounterWeb.Components.TitlesLiveView do
         (updates :title values across ALL StatefulComponents and the TitleComponent)
   """
   def handle_info(
-      {LiveViewCounterWeb.Components.StatefulComponent,
-      :updated_title,
-      %{title: updated_title}},
-      socket
-    ) do
-      {:noreply, assign(socket, title: updated_title)}
+        {LiveViewCounterWeb.Components.StatefulComponent, :updated_title,
+         %{title: updated_title}},
+        socket
+      ) do
+    {:noreply, assign(socket, title: updated_title)}
   end
 end

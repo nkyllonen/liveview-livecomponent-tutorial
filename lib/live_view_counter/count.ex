@@ -19,15 +19,15 @@ defmodule LiveViewCounter.Count do
   end
 
   def incr() do
-    GenServer.call @name, :incr
+    GenServer.call(@name, :incr)
   end
 
   def decr() do
-    GenServer.call @name, :decr
+    GenServer.call(@name, :decr)
   end
 
   def current() do
-    GenServer.call @name, :current
+    GenServer.call(@name, :current)
   end
 
   def init(start_count) do

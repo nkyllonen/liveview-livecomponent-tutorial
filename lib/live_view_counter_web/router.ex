@@ -17,8 +17,13 @@ defmodule LiveViewCounterWeb.Router do
   scope "/", LiveViewCounterWeb do
     pipe_through :browser
 
+    # we can give a live_action atom that will be available in the socket
+    # passed into handle_params
+    # note: LiveView module names must end in "Live" to receive a live_action atom
     live "/", PageLive, :index
-    live "/counter", CounterLiveView
+    live "/counter", CounterLive, :show
+    live "/counter/confirm-boom", CounterLive, :confirm_boom
+
     live "/blocks", Components.BlocksLiveView
     live "/titles", Components.TitlesLiveView
   end

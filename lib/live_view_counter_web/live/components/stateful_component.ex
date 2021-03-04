@@ -31,10 +31,10 @@ defmodule LiveViewCounterWeb.Components.StatefulComponent do
         simply need to send to self()
   """
   def handle_event(
-      "set_title",
-      %{"heading" => %{"title" => updated_title}},
-      socket
-    ) do
+        "set_title",
+        %{"heading" => %{"title" => updated_title}},
+        socket
+      ) do
     send(self(), {__MODULE__, :updated_title, %{title: updated_title}})
     {:noreply, socket}
   end
